@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { View, Text, Button, TouchableOpacity } from "react-native";
+import { View, Text, Button, TouchableOpacity, StyleSheet, ImageBackground } from "react-native";
 import { Calendar } from "react-native-calendars"
 import { db } from "../../firebaseConfig"
 import { getDocs, collection, query, where } from "firebase/firestore"
@@ -78,7 +78,7 @@ export default function StudentCalendar({ open, setOpen }) {
                 fontSize: '10',
                 textAlign: 'center'
               }}>
-                {eventList[date.day].length > 0 && date.month === currentMonth ? 
+                {eventList[date.day].length > 0 && state !== 'disabled' ? 
                   eventList[date.day].length.toString() : ''}
               </Text>
             </View>
@@ -86,21 +86,92 @@ export default function StudentCalendar({ open, setOpen }) {
         }}
       />
       {selectedDay > 0 &&
-        <View>
+        <>
           {eventList[selectedDay].map((value, index) => {
             return (
-              <View key={index}>
-                <Text>
-                  Title: {value.title}, description: {value.description}, group: {value.group}
-                </Text>
-                <Text>
-                  Date: {value.year} {value.month} {value.day}
-                </Text>
+              <View style={styles.eventOuterContainer} key={index}>
+                <View style={styles.eventInnerContainer} key={index}>
+                  <View style={styles.firstRow}>
+                    <View style={styles.title}>
+                      <Text>{value.title}</Text>
+                    </View>
+                    <View style={styles.group}>
+                      <Text>{value.group}</Text>
+                    </View>
+                    <View style={styles.date}>
+                      <Text>{value.day}-{value.month}-{value.year}</Text>
+                    </View>
+                  </View>
+                  <View style={styles.description}>
+                    <Text>{value.description}</Text>  
+                  </View>                  
+                </View>
               </View>
+              
             )
           })}
-        </View> 
+        </> 
       }
     </View>
   )
 }
+
+const styles = StyleSheet.create({
+  eventOuterContainer: {
+    height: '30%',
+    width: '100%',
+    alignItems: 'center'
+  },
+  eventInnerContainer: {
+    height: '100%',
+    width: '95%',
+    backgroundColor: '#E3ACF9',
+    borderRadius: '5px',
+    justifyContent: 'flex-start',
+    alignItems: 'center'
+  },
+  firstRow: {
+    height: '20%',
+    width: '100%',
+    flexDirection: 'row',
+    //backgroundColor: '#FADA9D',
+    marginTop: '5%',
+    justifyContent: 'center',
+    alignItems: 'center'
+  },
+  title: {
+    height: '100%',
+    width: '30%',
+    backgroundColor: '#D3756B',
+    marginRight: '2.5%',
+    justifyContent: 'center',
+    alignItems: 'center',
+    borderRadius: '5px'
+  },
+  group: {
+    height: '100%',
+    width: '30%',
+    backgroundColor: '#D3756B',
+    marginRight: '2.5%',
+    justifyContent: 'center',
+    alignItems: 'center',
+    borderRadius: '5px'
+  },
+  date: {
+    height: '100%',
+    width: '30%',
+    backgroundColor: '#D3756B',
+    justifyContent: 'center',
+    alignItems: 'center',
+    borderRadius: '5px'
+  },
+  description: {
+    height: '50%',
+    width: '90%',
+    flexDirection: 'row',
+    marginTop: '4%',
+    backgroundColor: '#FADA9D',
+    padding: '2%',
+    borderRadius: '5px'
+  }
+})

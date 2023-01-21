@@ -1,4 +1,4 @@
-import { Button, StyleSheet, Text, TextInput, View } from 'react-native';
+import { Button, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
 import { useState } from 'react';
 import { auth } from '../firebaseConfig';
 import { signInWithEmailAndPassword, createUserWithEmailAndPassword } from "firebase/auth"
@@ -47,18 +47,84 @@ export default function Login({ navigation }) {
   }
 
   return (
-    <View>
+    <View style={styles.container}>
       {!openLogin && 
-        <Button title={"Login"} onPress={() => setOpenLogin(true)}/> 
+        <TouchableOpacity style={styles.openLoginTouchableOpacity} activeOpacity={0.5} onPress={() => setOpenLogin(true)}>
+          <Text>Open</Text>
+        </TouchableOpacity>
       }
       {openLogin && 
-        <View>
-          <TextInput placeholder="Gmail" onChangeText={(e) => onChangeText(e, setEmail)}/>
-          <TextInput placeholder="Password" onChangeText={(e) => onChangeText(e, setPassword)}/>
-          <Button title={"Submit"} onPress={() => authenticate()} />
-          <Button title={"Close"} onPress={() => setOpenLogin(false)} />
-        </View>
+        <>
+          <View style={styles.emailTextInputView}>
+            <TextInput style={styles.emailTextInput} placeholder="  Email" onChangeText={(e) => onChangeText(e, setEmail)}/>
+          </View>
+          <View style={styles.passwordTextInputView}>
+            <TextInput style={styles.passwordTextInput} placeholder="  Password" onChangeText={(e) => onChangeText(e, setPassword)}/>
+          </View>
+          <TouchableOpacity style={styles.submitTouchableOpacity} activeOpacity={0.5} onPress={() => authenticate()}>
+            <Text>Submit</Text>
+          </TouchableOpacity>
+          <TouchableOpacity style={styles.closeLoginTouchableOpacity} activeOpacity={0.5} onPress={() => setOpenLogin(false)}>
+            <Text>Close</Text>
+          </TouchableOpacity>
+        </>
       }
     </View>
   )
 }
+
+const styles = StyleSheet.create({
+  container: {
+    height: '100%',
+    backgroundColor: '#FFF2F2',
+    justifyContent: 'center',
+    alignItems: 'center'
+  },
+  openLoginTouchableOpacity: {
+    height: '5%',
+    width: '50%',
+    borderRadius: '10px',
+    backgroundColor: '#FFD4D4',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  emailTextInputView: {
+    height: '7.5%',
+    width: '70%',
+    backgroundColor: '#CDE990',
+    borderRadius: '10px',
+    marginBottom: '5%'
+  },
+  emailTextInput: {
+    height: '100%',
+    width: '100%',
+  },
+  passwordTextInputView: {
+    height: '7.5%',
+    width: '70%',
+    backgroundColor: '#CDE990',
+    borderRadius: '10px',
+    marginBottom: '5%'
+  },
+  passwordTextInput: {
+    height: '100%',
+    width: '80%',
+  },
+  submitTouchableOpacity: {
+    height: '7.5%',
+    width: '45%',
+    borderRadius: '10px',
+    backgroundColor: '#FFD4D4',
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginBottom: '20%'
+  },
+  closeLoginTouchableOpacity: {
+    height: '5%',
+    width: '25%',
+    borderRadius: '10px',
+    backgroundColor: '#F55050',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+});

@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { View, Text, Button, TextInput } from "react-native";
+import { View, Text, Button, TextInput, StyleSheet, TouchableOpacity } from "react-native";
 import DateTimePicker from '@react-native-community/datetimepicker';
 import { addDoc, collection, getDoc, doc } from "firebase/firestore"
 import { db } from "../../firebaseConfig";
@@ -41,13 +41,88 @@ export default function AddEvent({ open, setOpen }) {
   }
 
   return (
-    <View>
-      <TextInput placeholder="Title" onChangeText={(e) => onChange(e, setTitle)} />     
-      <TextInput placeholder="Description" onChangeText={(e) => onChange(e, setDescription)} />
-      <TextInput placeholder="Group" onChangeText={(e) => onChange(e, setGroup)} />
+    <View style={styles.container}>
+      <View style={styles.titleTextInputView}>
+        <TextInput style={styles.titleTextInput} placeholder="  Title" onChangeText={(e) => onChange(e, setTitle)} />     
+      </View>
+      <View style={styles.descriptionTextInputView}>
+        <TextInput style={styles.descriptionTextInput} placeholder="  Description" onChangeText={(e) => onChange(e, setDescription)} />
+      </View>
+      <View style={styles.groupTextInputView}>
+        <TextInput style={styles.groupTextInput} placeholder="  Group" onChangeText={(e) => onChange(e, setGroup)} />
+      </View>
       <DateTimePicker value={date} onChange={(e, date) => onChange(date, setDate)}/>
-      <Button title={"Submit"} onPress={() => onSubmit()} />
-      <Button title={"Close"} onPress={() => setOpen({...open, calendar: true, addEvent: false})}/>
+      <TouchableOpacity style={styles.submitTouchableOpacity} activeOpacity={0.5} onPress={() => onSubmit()}>
+        <Text>Submit</Text>        
+      </TouchableOpacity>
+      <TouchableOpacity 
+        style={styles.closeTouchableOpacity}
+        activeOpacity={0.5} 
+        onPress={() => setOpen({...open, calendar: true, addEvent: false})}
+      >
+        <Text>Close</Text>
+      </TouchableOpacity>
     </View>
   )
 }
+
+const styles = StyleSheet.create({
+  container: {
+    height: '100%',
+    position: 'relative',
+    backgroundColor: '#FFF2F2',
+    justifyContent: 'center',
+    alignItems: 'center'
+  },
+  titleTextInputView: {
+    height: '7.5%',
+    width: '50%',
+    backgroundColor: '#84D2C5',
+    marginBottom: '5%',
+    borderRadius: '10px'
+  },
+  titleTextInput: {
+    height: '100%',
+    width: '100%'
+  },  
+  descriptionTextInputView: {
+    height: '7.5%',
+    width: '50%',
+    backgroundColor: '#84D2C5',
+    marginBottom: '5%',
+    borderRadius: '10px'
+  },
+  descriptionTextInput: {
+    height: '100%',
+    width: '100%'
+  },
+  groupTextInputView: {
+    height: '7.5%',
+    width: '50%',
+    backgroundColor: '#84D2C5',
+    marginBottom: '5%',
+    borderRadius: '10px'
+  },
+  groupTextInput: {
+    height: '100%',
+    width: '100%'
+  },
+  submitTouchableOpacity: {
+    height: '7.5%',
+    width: '40%',
+    borderRadius: '10px',
+    backgroundColor: '#FFD4D4',
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginBottom: '5%',
+    marginTop: '5%'
+  },
+  closeTouchableOpacity: {
+    height: '5%',
+    width: '30%',
+    borderRadius: '10px',
+    backgroundColor: '#F55050',
+    justifyContent: 'center',
+    alignItems: 'center',
+  }
+})
