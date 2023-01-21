@@ -12,7 +12,10 @@ const Stack = createNativeStackNavigator();
 export default function App() {
   return (
     <NavigationContainer>
-      <Stack.Navigator initialRouteName="Login">
+      <Stack.Navigator initialRouteName="Login" screenOptions={{
+        headerStyle: styles.headerStyle,
+        headerTintColor: '#fff',
+      }}>
         <Stack.Screen name="Login" component={Login}/>
         <Stack.Screen name="AddInfo" component={AddInfo}/>
         <Stack.Screen name="TeacherCalendar" component={TeacherMain}/>
@@ -21,3 +24,9 @@ export default function App() {
     </NavigationContainer>
   );
 }
+
+const styles = StyleSheet.create({
+  headerStyle: {
+    backgroundColor: '#86A3B8'
+  }
+})
