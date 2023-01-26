@@ -1,4 +1,4 @@
-import { Button, View, StyleSheet, Text, TextInput, TouchableOpacity } from "react-native";
+import { Button, View, StyleSheet, Text, TextInput, TouchableOpacity, ScrollView } from "react-native";
 import { useState } from "react";
 import { addDoc, collection, doc, setDoc } from "firebase/firestore"
 import { db } from "../../firebaseConfig";
@@ -48,9 +48,9 @@ export default function AddGroup({ open, setOpen }) {
   }
 
   return (
-    <View style={styles.container}>
+    <ScrollView style={styles.container} contentContainerStyle={styles.contentContainer}>
       <View style={styles.groupNameTextInputView}>
-        <TextInput style={styles.groupNameTextInput} placeholder="  Group name" onChangeText={(e) => setGroupName(e)}/>
+        <TextInput style={styles.groupNameTextInput} placeholder="  Tên nhóm" onChangeText={(e) => setGroupName(e)}/>
       </View>
       {groupMember.map((value, index) => {
         return (
@@ -59,7 +59,7 @@ export default function AddGroup({ open, setOpen }) {
               <TextInput style={styles.emailTextInput} placeholder="  Email" onChangeText={(e) => onChange(e, index, "email")}/>
             </View>
             <View style={styles.nameTextInputView}>
-              <TextInput style={styles.nameTextInput} placeholder=" Name" onChangeText={(e) => onChange(e, index, "name")}/>
+              <TextInput style={styles.nameTextInput} placeholder=" Tên" onChangeText={(e) => onChange(e, index, "name")}/>
             </View>
             {index < 50 && index === groupMember.length - 1 && 
               <TouchableOpacity style={styles.addMemberTouchableOpacity} activeOpacity={0.5} onPress={() => onAdding()}>
@@ -75,30 +75,35 @@ export default function AddGroup({ open, setOpen }) {
         )
       })}
       <TouchableOpacity style={styles.submitTouchableOpacity} activeOpacity={0.5} onPress={() => onSubmit()}> 
-        <Text>Submit</Text>
+        <Text style={{
+          fontFamily: 'Philosopher-Regular',
+          fontSize: 20,
+        }}>Gửi</Text>
       </TouchableOpacity>
       <TouchableOpacity 
         style={styles.closeTouchableOpacity} 
         activeOpacty={0.5} 
         onPress={() =>  setOpen({...open, calendar: true, addGroup: false})}
       >
-        <Text>Close</Text>
+        <Text>X</Text>
       </TouchableOpacity>
-    </View>
+    </ScrollView>
   )
 }
 
 const styles = StyleSheet.create({
   container: {
-    height: '100%',
+    flex: 1,
+    position: 'relative'
+  },
+  contentContainer: {
     justifyContent: 'flex-start',
     alignItems: 'center',
-    overflow: 'hidden'
   },
   groupNameTextInputView: {
-    height: '7.5%',
-    width: '50%',
-    backgroundColor: '#84D2C5',
+    height: 50,
+    width: '65%',
+    backgroundColor: '#A6D1E6',
     marginBottom: '5%',
     borderRadius: '10px',
     marginTop: '10%'
@@ -108,7 +113,7 @@ const styles = StyleSheet.create({
     width: '100%'
   },
   memberContainer: {
-    height: '7.5%',
+    height: 50,
     width: '85%',
     //backgroundColor: '#F273E6',
     flexDirection: 'row',
@@ -119,8 +124,8 @@ const styles = StyleSheet.create({
   emailTextInputView: {
     height: '100%',
     width: '35%',
-    backgroundColor: '#84D2C5',
-    borderRadius: '5px',
+    backgroundColor: '#A6D1E6',
+    borderRadius: '7.5px',
     justifyContent: 'center',
     alignItems: 'center',
     marginRight: '2.5%'
@@ -132,8 +137,8 @@ const styles = StyleSheet.create({
   nameTextInputView: {
     height: '100%',
     width: '35%',
-    backgroundColor: '#84D2C5',
-    borderRadius: '5px',
+    backgroundColor: '#A6D1E6',
+    borderRadius: '7.5px',
     justifyContent: 'center',
     alignItems: 'center',
     marginRight: '2.5%'
@@ -144,7 +149,7 @@ const styles = StyleSheet.create({
   },
   addMemberTouchableOpacity: {
     height: '70%',
-    width: '12.5%',
+    aspectRatio: '1:1',
     backgroundColor: '#03C988',
     justifyContent: 'center',
     alignItems: 'center',
@@ -153,15 +158,16 @@ const styles = StyleSheet.create({
   },
   deleteMemberTouchableOpacity: {
     height: '70%',
-    width: '12.5%',
+    aspectRatio: '1:1',
     backgroundColor: '#CD0404',
     justifyContent: 'center',
     alignItems: 'center',
     borderRadius: '10px'
   },
   submitTouchableOpacity: {
-    height: '7.5%',
-    width: '40%',
+    height: 45,
+    //width: '40%',
+    aspectRatio: '2:1',
     borderRadius: '10px',
     backgroundColor: '#FFD4D4',
     justifyContent: 'center',
@@ -170,8 +176,8 @@ const styles = StyleSheet.create({
     marginTop: '5%'
   },
   closeTouchableOpacity: {
-    height: '5%',
-    width: '30%',
+    height: 35,
+    aspectRatio: '1:1',
     borderRadius: '10px',
     backgroundColor: '#F55050',
     justifyContent: 'center',

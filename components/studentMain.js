@@ -15,6 +15,6 @@ const styles = StyleSheet.create({
   container: {
     height: '100%',
     position: 'relative',
-    backgroundColor: '#FFF2F2',
+    backgroundColor: '#DDDDDD',
   },
 })

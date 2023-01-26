@@ -1,16 +1,35 @@
 import { Button, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
-import { useState } from 'react';
+import { useState, useCallback } from 'react';
 import { auth } from '../firebaseConfig';
 import { signInWithEmailAndPassword, createUserWithEmailAndPassword } from "firebase/auth"
 import { setDoc, doc } from "firebase/firestore"
 import { db } from '../firebaseConfig';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { useFonts } from 'expo-font'
+import * as SplashScreen from 'expo-splash-screen';
+
+SplashScreen.preventAutoHideAsync();
 
 export default function Login({ navigation }) {
 
   const [openLogin, setOpenLogin] = useState(false);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+
+  const [fontsLoaded] = useFonts({
+    'Philosopher-Regular': require('../assets/fonts/Philosopher-Regular.otf'),
+    'Philosopher-Bold': require('../assets/fonts/Philosopher-Bold.otf'),
+  })
+
+  const onLayoutRootView = useCallback(async () => {
+    if (fontsLoaded) {
+      await SplashScreen.hideAsync();
+    }
+  }, [fontsLoaded]);
+
+  if (!fontsLoaded) {
+    return null;
+  }
 
   const onChangeText = (e, setState) => {
     setState(e);
@@ -47,11 +66,22 @@ export default function Login({ navigation }) {
   }
 
   return (
-    <View style={styles.container}>
+    <View style={styles.container} onLayout={onLayoutRootView}>
       {!openLogin && 
-        <TouchableOpacity style={styles.openLoginTouchableOpacity} activeOpacity={0.5} onPress={() => setOpenLogin(true)}>
-          <Text>Open</Text>
-        </TouchableOpacity>
+        <>
+          <View style={styles.titleView}>
+            <Text style={{ 
+              fontFamily: 'Philosopher-Bold',
+              fontSize: '30' 
+            }}>Lịch nhắc nhở học tập</Text>
+          </View>
+          <TouchableOpacity style={styles.openLoginTouchableOpacity} activeOpacity={0.5} onPress={() => setOpenLogin(true)}>
+            <Text style={{
+              fontFamily: 'Philosopher-Regular',
+              fontSize: '17.5'
+            }}>Đăng nhập</Text>
+          </TouchableOpacity>
+        </>
       }
       {openLogin && 
         <>
@@ -59,13 +89,16 @@ export default function Login({ navigation }) {
             <TextInput style={styles.emailTextInput} placeholder="  Email" onChangeText={(e) => onChangeText(e, setEmail)}/>
           </View>
           <View style={styles.passwordTextInputView}>
-            <TextInput style={styles.passwordTextInput} placeholder="  Password" onChangeText={(e) => onChangeText(e, setPassword)}/>
+            <TextInput style={styles.passwordTextInput} placeholder="  Mật khẩu" onChangeText={(e) => onChangeText(e, setPassword)}/>
           </View>
           <TouchableOpacity style={styles.submitTouchableOpacity} activeOpacity={0.5} onPress={() => authenticate()}>
-            <Text>Submit</Text>
+            <Text style={{
+              fontFamily: 'Philosopher-Regular',
+              fontSize: '17.5'
+            }}>Gửi</Text>
           </TouchableOpacity>
           <TouchableOpacity style={styles.closeLoginTouchableOpacity} activeOpacity={0.5} onPress={() => setOpenLogin(false)}>
-            <Text>Close</Text>
+            <Text>X</Text>
           </TouchableOpacity>
         </>
       }
@@ -78,7 +111,11 @@ const styles = StyleSheet.create({
     height: '100%',
     backgroundColor: '#FFF2F2',
     justifyContent: 'center',
-    alignItems: 'center'
+    alignItems: 'center',
+    position: 'relative'
+  },
+  titleView: {
+    marginBottom: '5%'
   },
   openLoginTouchableOpacity: {
     height: '5%',
@@ -91,9 +128,9 @@ const styles = StyleSheet.create({
   emailTextInputView: {
     height: '7.5%',
     width: '70%',
-    backgroundColor: '#CDE990',
+    backgroundColor: '#E5E0FF',
     borderRadius: '10px',
-    marginBottom: '5%'
+    marginBottom: '5%',
   },
   emailTextInput: {
     height: '100%',
@@ -102,7 +139,7 @@ const styles = StyleSheet.create({
   passwordTextInputView: {
     height: '7.5%',
     width: '70%',
-    backgroundColor: '#CDE990',
+    backgroundColor: '#E5E0FF',
     borderRadius: '10px',
     marginBottom: '5%'
   },
@@ -111,8 +148,9 @@ const styles = StyleSheet.create({
     width: '80%',
   },
   submitTouchableOpacity: {
-    height: '7.5%',
-    width: '45%',
+    height: '5%',
+    //width: '45%',
+    aspectRatio: '2:1',
     borderRadius: '10px',
     backgroundColor: '#FFD4D4',
     justifyContent: 'center',
@@ -121,10 +159,13 @@ const styles = StyleSheet.create({
   },
   closeLoginTouchableOpacity: {
     height: '5%',
-    width: '25%',
+    //width: '25%',
+    aspectRatio: '1:1',
     borderRadius: '10px',
     backgroundColor: '#F55050',
     justifyContent: 'center',
     alignItems: 'center',
+    position: 'absolute',
+    bottom: '5%'
   },
 });

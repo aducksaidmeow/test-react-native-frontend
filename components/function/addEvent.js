@@ -2,8 +2,10 @@ import { useState } from "react";
 import { View, Text, Button, TextInput, StyleSheet, TouchableOpacity } from "react-native";
 import DateTimePicker from '@react-native-community/datetimepicker';
 import { addDoc, collection, getDoc, doc } from "firebase/firestore"
-import { db } from "../../firebaseConfig";
+import { ref, uploadBytes, getDownloadURL } from "firebase/storage"
+import { db, storage } from "../../firebaseConfig";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import * as DocumentPicker from 'expo-document-picker'
 
 export default function AddEvent({ open, setOpen }) {
 
@@ -12,12 +14,23 @@ export default function AddEvent({ open, setOpen }) {
   const [group, setGroup] = useState("");
   const [date, setDate] = useState(new Date());
 
+  const [file, setFile] = useState(null);
+  const [filePath, setFilePath] = useState(null);
+  const [fileName, setFileName] = useState("Empty file");
+
   const onSubmit = async() => {
     const year = date.getFullYear();
     const month = date.getMonth() + 1;
     const day = date.getDate();
 
     const email = await AsyncStorage.getItem("email");
+
+    var URL = null;
+
+    if (file !== null) {
+      const response = await uploadBytes(ref(storage, email + '/' + filePath), file);
+      URL = await getDownloadURL(ref(storage, email + '/' + filePath));
+    }
 
     const groupMemberSnapshot = await getDoc(doc(db, email + '/info/groups/' + group));
     if (!groupMemberSnapshot.exists()) return;
@@ -26,7 +39,7 @@ export default function AddEvent({ open, setOpen }) {
 
     const promise = await groupMember.map(async(value, index) => {
       const email = value.email;
-      return await addDoc(collection(db, email + '/info/events'), { title, description, group, year, month, day })
+      return await addDoc(collection(db, email + '/info/events'), { title, description, group, year, month, day, URL, fileName })
     })
 
     Promise.all(promise).then((response) => {
@@ -40,27 +53,50 @@ export default function AddEvent({ open, setOpen }) {
     setState(e);
   }
 
+  const getFile = async() => {
+    const documentResult = await DocumentPicker.getDocumentAsync();
+    console.log(documentResult);
+    if (documentResult.type === 'cancel') {
+      setFileName("Empty file");
+      setFilePath(null);
+      setFile(null);
+    } else {
+      setFileName(documentResult.name);
+      setFilePath(documentResult.uri.substring(documentResult.uri.lastIndexOf('/') + 1));
+      setFile(documentResult.file);
+    }
+  }
+
   return (
     <View style={styles.container}>
       <View style={styles.titleTextInputView}>
-        <TextInput style={styles.titleTextInput} placeholder="  Title" onChangeText={(e) => onChange(e, setTitle)} />     
+        <TextInput style={styles.titleTextInput} placeholder="  Tiêu đề" onChangeText={(e) => onChange(e, setTitle)} />     
       </View>
       <View style={styles.descriptionTextInputView}>
-        <TextInput style={styles.descriptionTextInput} placeholder="  Description" onChangeText={(e) => onChange(e, setDescription)} />
+        <TextInput style={styles.descriptionTextInput} placeholder="  Nội dung" onChangeText={(e) => onChange(e, setDescription)} />
       </View>
       <View style={styles.groupTextInputView}>
-        <TextInput style={styles.groupTextInput} placeholder="  Group" onChangeText={(e) => onChange(e, setGroup)} />
+        <TextInput style={styles.groupTextInput} placeholder="  Nhóm" onChangeText={(e) => onChange(e, setGroup)} />
       </View>
       <DateTimePicker value={date} onChange={(e, date) => onChange(date, setDate)}/>
+      <TouchableOpacity style={styles.fileTouchableOpacity} activeOpacity={0.5} onPress={() => getFile()}>
+        <Text style={{
+          fontFamily: 'Philosopher-Regular',
+          fontSize: 17.5
+        }}>{fileName}</Text>
+      </TouchableOpacity>
       <TouchableOpacity style={styles.submitTouchableOpacity} activeOpacity={0.5} onPress={() => onSubmit()}>
-        <Text>Submit</Text>        
+        <Text style={{
+          fontFamily: 'Philosopher-Regular',
+          fontSize: '20'
+        }}>Gửi</Text>        
       </TouchableOpacity>
       <TouchableOpacity 
         style={styles.closeTouchableOpacity}
         activeOpacity={0.5} 
         onPress={() => setOpen({...open, calendar: true, addEvent: false})}
       >
-        <Text>Close</Text>
+        <Text>X</Text>
       </TouchableOpacity>
     </View>
   )
@@ -76,8 +112,8 @@ const styles = StyleSheet.create({
   },
   titleTextInputView: {
     height: '7.5%',
-    width: '50%',
-    backgroundColor: '#84D2C5',
+    width: '65%',
+    backgroundColor: '#E5E0FF',
     marginBottom: '5%',
     borderRadius: '10px'
   },
@@ -87,8 +123,8 @@ const styles = StyleSheet.create({
   },  
   descriptionTextInputView: {
     height: '7.5%',
-    width: '50%',
-    backgroundColor: '#84D2C5',
+    width: '65%',
+    backgroundColor: '#E5E0FF',
     marginBottom: '5%',
     borderRadius: '10px'
   },
@@ -98,8 +134,8 @@ const styles = StyleSheet.create({
   },
   groupTextInputView: {
     height: '7.5%',
-    width: '50%',
-    backgroundColor: '#84D2C5',
+    width: '65%',
+    backgroundColor: '#E5E0FF',
     marginBottom: '5%',
     borderRadius: '10px'
   },
@@ -107,9 +143,19 @@ const styles = StyleSheet.create({
     height: '100%',
     width: '100%'
   },
-  submitTouchableOpacity: {
+  fileTouchableOpacity: {
     height: '7.5%',
-    width: '40%',
+    width: '65%',
+    backgroundColor: '#E5E0FF',
+    borderRadius: '10px',
+    marginTop: '5%',
+    justifyContent: 'center',
+    alignItems: 'center'
+  },
+  submitTouchableOpacity: {
+    height: '5%',
+    //width: '40%',
+    aspectRatio: '2:1',
     borderRadius: '10px',
     backgroundColor: '#FFD4D4',
     justifyContent: 'center',
@@ -119,10 +165,12 @@ const styles = StyleSheet.create({
   },
   closeTouchableOpacity: {
     height: '5%',
-    width: '30%',
+    aspectRatio: '1:1',
     borderRadius: '10px',
     backgroundColor: '#F55050',
     justifyContent: 'center',
     alignItems: 'center',
+    position: 'absolute',
+    bottom: '5%',
   }
 })

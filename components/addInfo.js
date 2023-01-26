@@ -1,4 +1,4 @@
-import { View, Text, Button, StyleSheet, TouchableOpacity } from "react-native"
+import { View, Text, Button, StyleSheet, TouchableOpacity, Image } from "react-native"
 import { db } from "../firebaseConfig"
 import { doc, setDoc } from "firebase/firestore"
 import AsyncStorage from "@react-native-async-storage/async-storage"
@@ -18,11 +18,19 @@ export default function AddInfo({ navigation }) {
 
   return (
     <View style={styles.container}>
-      <TouchableOpacity style={styles.teacherTouchableOpacity} activeOpacity={0.5} onPress={() => onPress("Teacher")}>
-        <Text>Teacher</Text>
-      </TouchableOpacity>
       <TouchableOpacity style={styles.studentTouchableOpacity} activeOpacity={0.5} onPress={() => onPress("Student")}>
-        <Text>Student</Text>
+        <Image source={require('./student.png')} style={styles.studentImage}/>
+        <Text style={{
+          fontFamily: 'Philosopher-Bold',
+          fontSize: '20'
+        }}>Học sinh</Text>
+      </TouchableOpacity>
+      <TouchableOpacity style={styles.teacherTouchableOpacity} activeOpacity={0.5} onPress={() => onPress("Teacher")}>
+        <Image source={require('./teacher.png')} style={styles.teacherImage}/>
+        <Text style={{
+          fontFamily: 'Philosopher-Bold',
+          fontSize: '20'
+        }}>Giáo viên</Text>
       </TouchableOpacity>
     </View>
   )
@@ -36,21 +44,31 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     flexDirection: 'row'
   },
+  teacherImage: {
+    height: '35%',
+    aspectRatio: '1.52:1',
+    marginBottom: '10%'
+  },
   teacherTouchableOpacity: {
-    height: '7.5%',
+    height: '35%',
     width: '40%',
-    backgroundColor: '#C27664',
+    backgroundColor: '#E5E0FF',
     justifyContent: 'center',
     alignItems: 'center',
-    marginRight: '5%',
     borderRadius: '10px'
   },
+  studentImage: {
+    height: '42.5%',
+    aspectRatio: '1.125:1',
+    marginBottom: '10%'
+  },
   studentTouchableOpacity: {
-    height: '7.5%',
+    height: '35%',
     width: '40%',
-    backgroundColor: '#C27664',
+    backgroundColor: '#E5E0FF',
     justifyContent: 'center',
     alignItems: 'center',
-    borderRadius: '10px'
+    borderRadius: '10px',
+    marginRight: '5%'
   }
 })

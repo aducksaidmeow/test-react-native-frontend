@@ -1,5 +1,5 @@
 import { useState } from "react"
-import { View, Button, Text, StyleSheet, TouchableOpacity } from "react-native"
+import { View, Button, Text, StyleSheet, TouchableOpacity, Image } from "react-native"
 import TeacherCalendar from "./function/teacherCalendar"
 import AddEvent from "./function/addEvent"
 import AddGroup from "./function/addGroup"
@@ -25,21 +25,21 @@ export default function TeacherMain() {
               activeOpacity={0.5} 
               onPress={() => setOpen({...open, calendar: false, addEvent: true})}
             >
-              <Text>Add event</Text>
+              <Image source={require('./add-event.png')} style={styles.addEventImage}/>
             </TouchableOpacity>
             <TouchableOpacity 
               style={styles.addGroupTouchableOpacity}
               activeOpacity={0.5} 
               onPress={() => setOpen({...open, calendar: false, addGroup: true})}
             >
-              <Text>Add group</Text>
+              <Image source={require('./add-group.png')} style={styles.addGroupImage}/>
             </TouchableOpacity>
             <TouchableOpacity 
               style={styles.displayGroupTouchableOpacity}
               activeOpacity={0.5}
               onPress={() => setOpen({...open, calendar: false, displayGroup: true})}
             >
-              <Text>Display group</Text>
+              <Image source={require('./display-group.png')} style={styles.displayGroupImage}/>
             </TouchableOpacity>
           </View>
         </>
@@ -61,41 +61,56 @@ const styles = StyleSheet.create({
   container: {
     height: '100%',
     position: 'relative',
-    backgroundColor: '#FFF2F2',
+    backgroundColor: '#DDDDDD',
   },
   buttonContainer: {
     height: '35%',
     position: 'absolute',
     bottom: '0%',
-    right: '0%',
+    right: '2.5%',
     alignItems: 'center'
     //backgroundColor: '#567189',
   },
   addEventTouchableOpacity: {
     height:'25%',
-    width: '80%',
-    backgroundColor: '#658864',
+    //width: '80%',
+    aspectRatio: '1:1',
+    backgroundColor: '#EAE0DA',
     justifyContent: 'center',
     alignItems: 'center',
     marginBottom: '10%',
     borderRadius: '15px'
+  },
+  addEventImage: {
+    height: '75%',
+    aspectRatio: '1:1',
   },
   addGroupTouchableOpacity: {
     height:'25%',
-    width: '80%',
-    backgroundColor: '#658864',
+    //width: '80%',
+    aspectRatio: '1:1',
+    backgroundColor: '#EAE0DA',
     justifyContent: 'center',
     alignItems: 'center',
     marginBottom: '10%',
     borderRadius: '15px'
   },
+  addGroupImage: {
+    height: '75%',
+    aspectRatio: '1:1',
+  },  
   displayGroupTouchableOpacity: {
     height:'25%',
-    width: '80%',
-    backgroundColor: '#658864',
+    //width: '80%',
+    aspectRatio: '1:1',
+    backgroundColor: '#EAE0DA',
     justifyContent: 'center',
     alignItems: 'center',
     marginBottom: '10%',
     borderRadius: '15px'
+  },
+  displayGroupImage: {
+    height: '75%',
+    aspectRatio: '1:1',
   }
 })

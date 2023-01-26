@@ -1,9 +1,10 @@
 import { useEffect, useState } from "react";
-import { View, Text, Button, TouchableOpacity, StyleSheet, ImageBackground } from "react-native";
+import { View, Text, Button, TouchableOpacity, StyleSheet, ScrollView } from "react-native";
 import { Calendar } from "react-native-calendars"
 import { db } from "../../firebaseConfig"
 import { getDocs, collection, query, where } from "firebase/firestore"
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import * as Linking from 'expo-linking'
 
 export default function StudentCalendar({ open, setOpen }) {
 
@@ -37,7 +38,7 @@ export default function StudentCalendar({ open, setOpen }) {
   }, [])
 
   const onDayPress = (e) => {
-    if (currentMonth === e.month) setSelectedDay(e.day);
+    setSelectedDay(e.day);
   }
 
   const onMonthChange = (e) => {
@@ -47,7 +48,7 @@ export default function StudentCalendar({ open, setOpen }) {
   }
 
   return (
-    <View>
+    <ScrollView style={styles.container} contentContainerStyle={styles.contentContainer}>
       {/*<Calendar 
         enableSwipeMonths={true}
         onDayPress={(e) => onDayPress(e)}
@@ -87,91 +88,68 @@ export default function StudentCalendar({ open, setOpen }) {
       />
       {selectedDay > 0 &&
         <>
-          {eventList[selectedDay].map((value, index) => {
-            return (
-              <View style={styles.eventOuterContainer} key={index}>
+          <View style={styles.eventOuterContainer}>
+            {eventList[selectedDay].map((value, index) => {
+              return (              
                 <View style={styles.eventInnerContainer} key={index}>
-                  <View style={styles.firstRow}>
-                    <View style={styles.title}>
-                      <Text>{value.title}</Text>
-                    </View>
-                    <View style={styles.group}>
-                      <Text>{value.group}</Text>
-                    </View>
-                    <View style={styles.date}>
-                      <Text>{value.day}-{value.month}-{value.year}</Text>
-                    </View>
-                  </View>
-                  <View style={styles.description}>
-                    <Text>{value.description}</Text>  
-                  </View>                  
+                  <Text style={{
+                    fontFamily: 'Philosopher-Regular',
+                    fontSize: 20,
+                  }}>Tiêu đề: {value.title}</Text>                  
+                  <Text style={{
+                    fontFamily: 'Philosopher-Regular',
+                    fontSize: 20,
+                  }}>Nhóm: {value.group}</Text>
+                  <Text style={{
+                    fontFamily: 'Philosopher-Regular',
+                    fontSize: 20,
+                  }}>Hạn cuối: {value.day}-{value.month}-{value.year}</Text>
+                  {value.URL !== null && 
+                    <TouchableOpacity activeOpacity={0.5} onPress={() => Linking.openURL(value.URL)}>
+                      <Text style={{
+                        fontFamily: 'Philosopher-Regular',
+                        fontSize: 20,
+                        color: '#4B56D2'
+                      }}>{value.fileName}</Text>
+                    </TouchableOpacity>
+                  }
+                  <Text style={{
+                    fontFamily: 'Philosopher-Regular',
+                    fontSize: 20,
+                  }}>Nội dung: {value.description}</Text>
                 </View>
-              </View>
-              
-            )
-          })}
+              )
+            })}
+          </View>
         </> 
       }
-    </View>
+    </ScrollView>
   )
 }
 
 const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+  },  
+  contentContainer: {
+
+  },
   eventOuterContainer: {
-    height: '30%',
     width: '100%',
-    alignItems: 'center'
+    alignItems: 'center',
   },
   eventInnerContainer: {
-    height: '100%',
+    //height: '100%',
     width: '95%',
-    backgroundColor: '#E3ACF9',
+    backgroundColor: '#F7F5EB',
     borderRadius: '5px',
     justifyContent: 'flex-start',
-    alignItems: 'center'
+    //alignItems: 'center',
+    flexDirection: 'column',
+    paddingLeft: '4%',
+    paddingTop: '2.5%',
+    paddingBottom: '2.5%',
+    paddingRight: '4%',
+    marginTop: 7.5
   },
-  firstRow: {
-    height: '20%',
-    width: '100%',
-    flexDirection: 'row',
-    //backgroundColor: '#FADA9D',
-    marginTop: '5%',
-    justifyContent: 'center',
-    alignItems: 'center'
-  },
-  title: {
-    height: '100%',
-    width: '30%',
-    backgroundColor: '#D3756B',
-    marginRight: '2.5%',
-    justifyContent: 'center',
-    alignItems: 'center',
-    borderRadius: '5px'
-  },
-  group: {
-    height: '100%',
-    width: '30%',
-    backgroundColor: '#D3756B',
-    marginRight: '2.5%',
-    justifyContent: 'center',
-    alignItems: 'center',
-    borderRadius: '5px'
-  },
-  date: {
-    height: '100%',
-    width: '30%',
-    backgroundColor: '#D3756B',
-    justifyContent: 'center',
-    alignItems: 'center',
-    borderRadius: '5px'
-  },
-  description: {
-    height: '50%',
-    width: '90%',
-    flexDirection: 'row',
-    marginTop: '4%',
-    backgroundColor: '#FADA9D',
-    padding: '2%',
-    borderRadius: '5px'
-  }
 })

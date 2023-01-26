@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react"
-import { View, Text, Button, StyleSheet, TouchableOpacity } from "react-native"
+import { View, Text, Button, StyleSheet, TouchableOpacity, ScrollView } from "react-native"
 import { db } from "../../firebaseConfig"
 import { getDocs, collection } from "firebase/firestore"
 import AsyncStorage from "@react-native-async-storage/async-storage";
@@ -28,7 +28,7 @@ export default function DisplayGroup({ open, setOpen }) {
   }
 
   return (
-    <View style={styles.container}>
+    <ScrollView style={styles.container} contentContainerStyle={styles.contentContainer}>
       {groupList.map((value, index) => {
         return (
           <>
@@ -57,43 +57,44 @@ export default function DisplayGroup({ open, setOpen }) {
         activeOpacity={0.5} 
         onPress={() => setOpen({...open, calendar: true, displayGroup: false })}
       >
-        <Text>Close</Text>
+        <Text>X</Text>
       </TouchableOpacity>
-    </View>
+    </ScrollView>
   )
 }
 
 const styles = StyleSheet.create({
   container: {
-    height: '100%',
+    flex: 1,
+  },
+  contentContainer: {
     justifyContent: 'flex-start',
     alignItems: 'center',
-    overflow: 'hidden',
-    marginTop: '10%'
   },
   groupTouchableOpacity: {
-    height: '7.5%',
-    width: '60%',
-    backgroundColor: '#D3756B',
+    height: 50,
+    width: '65%',
+    backgroundColor: '#BFEAF5',
     justifyContent: 'center',
     alignItems: 'center',
     borderRadius: '5px'
   },
   memberContainer: {
-    height: '5%',
-    width: '50%',
-    backgroundColor: '#E3ACF9',
+    height: 30,
+    width: '55%',
+    backgroundColor: '#E3F6FF',
     justifyContent: 'center',
-    textAlign: 'center',
+    alignItems: 'center',
     borderRadius: '5px'
   },
   closeTouchableOpacity: {
-    height: '5%',
-    width: '30%',
+    height: 35,
+    //width: '30%',
+    aspectRatio: '1:1',
     borderRadius: '10px',
     backgroundColor: '#F55050',
     justifyContent: 'center',
     alignItems: 'center',
-    marginTop: '5%'
+    marginTop: 15,
   }
 })
