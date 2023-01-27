@@ -2,7 +2,7 @@ import { useState } from "react";
 import { View, Text, Button, TextInput, StyleSheet, TouchableOpacity } from "react-native";
 import DateTimePicker from '@react-native-community/datetimepicker';
 import { addDoc, collection, getDoc, doc } from "firebase/firestore"
-import { ref, uploadBytes, getDownloadURL } from "firebase/storage"
+import { ref, uploadBytes, getDownloadURL, uploadString } from "firebase/storage"
 import { db, storage } from "../../firebaseConfig";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import * as DocumentPicker from 'expo-document-picker'
@@ -15,7 +15,6 @@ export default function AddEvent({ open, setOpen }) {
   const [date, setDate] = useState(new Date());
 
   const [file, setFile] = useState(null);
-  const [filePath, setFilePath] = useState(null);
   const [fileName, setFileName] = useState("Empty file");
 
   const onSubmit = async() => {
@@ -28,8 +27,8 @@ export default function AddEvent({ open, setOpen }) {
     var URL = null;
 
     if (file !== null) {
-      const response = await uploadBytes(ref(storage, email + '/' + filePath), file);
-      URL = await getDownloadURL(ref(storage, email + '/' + filePath));
+      await uploadBytes(ref(storage, email + '/' + fileName), file);
+      URL = await getDownloadURL(ref(storage, email + '/' + fileName));
     }
 
     const groupMemberSnapshot = await getDoc(doc(db, email + '/info/groups/' + group));
@@ -54,16 +53,15 @@ export default function AddEvent({ open, setOpen }) {
   }
 
   const getFile = async() => {
-    const documentResult = await DocumentPicker.getDocumentAsync();
-    console.log(documentResult);
+    const documentResult = await DocumentPicker.getDocumentAsync({});
     if (documentResult.type === 'cancel') {
       setFileName("Empty file");
-      setFilePath(null);
       setFile(null);
     } else {
       setFileName(documentResult.name);
-      setFilePath(documentResult.uri.substring(documentResult.uri.lastIndexOf('/') + 1));
-      setFile(documentResult.file);
+      const response = await fetch(documentResult.uri);
+      const blob = await response.blob();
+      setFile(blob);
     }
   }
 
