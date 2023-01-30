@@ -3,6 +3,7 @@ import { useState } from "react";
 import { addDoc, collection, doc, setDoc } from "firebase/firestore"
 import { db } from "../../firebaseConfig";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import Popup from "./popup";
 
 export default function AddGroup({ open, setOpen }) {
 
@@ -10,6 +11,9 @@ export default function AddGroup({ open, setOpen }) {
   const [groupMember, setGroupMember] = useState([{ email: "", name: "" }])
   const [key, setKey] = useState([0]);
   const [counter, setCounter] = useState(1);
+
+  const [popup, setPopup] = useState(0);
+  const [message, setMessage] = useState("");
 
   const onChange = (e, index, position) => {
     const newGroupMember = [...groupMember];
@@ -38,56 +42,101 @@ export default function AddGroup({ open, setOpen }) {
   }
 
   const onSubmit = async() => {
+
+    if (groupName === "") {
+      setMessage("Thiếu tên nhóm");
+      setPopup(-1);
+      return;
+    }
+
+    if (groupName.includes("/")) {
+      setMessage("Tên nhóm không được chứa dấu /");
+      setPopup(-1);
+      return;
+    }
+
+    var missingEmail = false;
+    var missingName = false;
+
+    groupMember.forEach((value, index) => {
+      if (value.email === "") {
+        missingEmail = true;
+      }
+      if (value.name === "") {
+        missingName = true;
+      }
+    })
+
+    if (missingEmail) {
+      setMessage("Thiếu email thành viên");
+      setPopup(-1);
+      return;
+    }
+
+    if (missingName) {
+      setMessage("Thiếu tên thành viên");
+      setPopup(-1);
+      return;
+    }
+
     const email = await AsyncStorage.getItem("email");
     const ref = doc(db, email + '/info/groups/' + groupName);
     setDoc(ref, { groupMember, groupName }).then((response) => {
       console.log(response);
+      setPopup(1);
     }).catch((error) => {
       console.log(error);
     })
   }
 
   return (
-    <ScrollView style={styles.container} contentContainerStyle={styles.contentContainer}>
-      <View style={styles.groupNameTextInputView}>
-        <TextInput style={styles.groupNameTextInput} placeholder="  Tên nhóm" onChangeText={(e) => setGroupName(e)}/>
-      </View>
-      {groupMember.map((value, index) => {
-        return (
-          <View style={styles.memberContainer} key={key[index]}>
-            <View style={styles.emailTextInputView}>
-              <TextInput style={styles.emailTextInput} placeholder="  Email" onChangeText={(e) => onChange(e, index, "email")}/>
-            </View>
-            <View style={styles.nameTextInputView}>
-              <TextInput style={styles.nameTextInput} placeholder=" Tên" onChangeText={(e) => onChange(e, index, "name")}/>
-            </View>
-            {index < 50 && index === groupMember.length - 1 && 
-              <TouchableOpacity style={styles.addMemberTouchableOpacity} activeOpacity={0.5} onPress={() => onAdding()}>
-                <Text>+</Text>  
-              </TouchableOpacity>
-            }
-            {groupMember.length > 1 && 
-              <TouchableOpacity style={styles.deleteMemberTouchableOpacity} activeOpacity={0.5} onPress={() => onDeleting(index)}>
-                <Text>-</Text>
-              </TouchableOpacity>
-            }
+    <>
+      {popup === 0 && 
+        <ScrollView style={styles.container} contentContainerStyle={styles.contentContainer}>
+          <View style={styles.groupNameTextInputView}>
+            <TextInput style={styles.groupNameTextInput} placeholder="  Tên nhóm" onChangeText={(e) => setGroupName(e)}/>
           </View>
-        )
-      })}
-      <TouchableOpacity style={styles.submitTouchableOpacity} activeOpacity={0.5} onPress={() => onSubmit()}> 
-        <Text style={{
-          fontFamily: 'Philosopher-Regular',
-          fontSize: 20,
-        }}>Gửi</Text>
-      </TouchableOpacity>
-      <TouchableOpacity 
-        style={styles.closeTouchableOpacity} 
-        activeOpacty={0.5} 
-        onPress={() =>  setOpen({...open, calendar: true, addGroup: false})}
-      >
-        <Text>X</Text>
-      </TouchableOpacity>
-    </ScrollView>
+          {groupMember.map((value, index) => {
+            return (
+              <View style={styles.memberContainer} key={key[index]}>
+                <View style={styles.emailTextInputView}>
+                  <TextInput style={styles.emailTextInput} placeholder="  Email" onChangeText={(e) => onChange(e, index, "email")}/>
+                </View>
+                <View style={styles.nameTextInputView}>
+                  <TextInput style={styles.nameTextInput} placeholder=" Tên" onChangeText={(e) => onChange(e, index, "name")}/>
+                </View>
+                {index < 50 && index === groupMember.length - 1 && 
+                  <TouchableOpacity style={styles.addMemberTouchableOpacity} activeOpacity={0.5} onPress={() => onAdding()}>
+                    <Text>+</Text>  
+                  </TouchableOpacity>
+                }
+                {groupMember.length > 1 && 
+                  <TouchableOpacity style={styles.deleteMemberTouchableOpacity} activeOpacity={0.5} onPress={() => onDeleting(index)}>
+                    <Text>-</Text>
+                  </TouchableOpacity>
+                }
+              </View>
+            )
+          })}
+          <TouchableOpacity style={styles.submitTouchableOpacity} activeOpacity={0.5} onPress={() => onSubmit()}> 
+            <Text style={{
+              fontFamily: 'Philosopher-Regular',
+              fontSize: 20,
+            }}>Gửi</Text>
+          </TouchableOpacity>
+          <TouchableOpacity 
+            style={styles.closeTouchableOpacity} 
+            activeOpacty={0.5} 
+            onPress={() =>  setOpen({...open, calendar: true, addGroup: false})}
+          >
+            <Text>X</Text>
+          </TouchableOpacity>
+        </ScrollView>
+      }
+      {popup !== 0 && 
+        <Popup popup={popup} setPopup={setPopup} message={message} setMessage={setMessage} /> 
+      }
+    </>
   )
 }
 
